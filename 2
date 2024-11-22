@@ -1,0 +1,139 @@
+Test Case 1: Verify Labels Are Applied to New Dataflow Jobs
+
+
+
+• Description: Ensure that all new Dataflow jobs created by the CI/CD pipeline have the required labels.
+
+• Steps:
+
+1. Trigger the CI/CD pipeline to create a new Dataflow job.
+
+2. Navigate to the Google Cloud Console or use gcloud commands to inspect the created Dataflow job.
+
+3. Check the metadata of the job for the expected labels.
+
+• Expected Result: The Dataflow job must include the correct labels as defined in the CI/CD configuration.
+
+
+
+Test Case 2: Validate Correctness of Label Values
+
+
+
+• Description: Verify that the labels applied to the Dataflow job have the correct key-value pairs.
+
+• Steps:
+
+1. Trigger the CI/CD pipeline to create a new Dataflow job.
+
+2. Retrieve the job details via the GCP console or gcloud dataflow jobs describe JOB_ID.
+
+3. Confirm the key-value pairs of the labels match the expected configuration.
+
+• Expected Result: All labels have the correct keys and values (e.g., env:prod, team:analytics).
+
+
+
+Test Case 3: Check for Presence of Mandatory Labels
+
+
+
+• Description: Ensure that specific mandatory labels are present in all new Dataflow jobs.
+
+• Steps:
+
+1. Trigger the CI/CD pipeline to create a Dataflow job.
+
+2. Inspect the labels applied to the job.
+
+3. Verify the presence of mandatory labels such as env, team, or project.
+
+• Expected Result: The Dataflow job includes all mandatory labels.
+
+
+
+Test Case 4: Test Pipeline Behavior When Labels Are Missing
+
+
+
+• Description: Verify the pipeline’s behavior if labels are not applied due to a misconfiguration.
+
+• Steps:
+
+1. Intentionally misconfigure the CI/CD pipeline to omit labels.
+
+2. Trigger the CI/CD pipeline to create a Dataflow job.
+
+3. Check if the pipeline throws an error or warning.
+
+• Expected Result: The pipeline should fail or provide a clear error message indicating missing labels.
+
+
+
+Test Case 5: Validate Dynamic Label Assignment Based on Environment
+
+
+
+• Description: Ensure that the pipeline assigns labels dynamically based on the deployment environment (e.g., env:dev, env:prod).
+
+• Steps:
+
+1. Deploy the pipeline to different environments (e.g., dev, staging, prod).
+
+2. Verify the labels applied to the Dataflow jobs in each environment.
+
+• Expected Result: The labels accurately reflect the deployment environment.
+
+
+
+Test Case 6: Verify Labels Are Consistent Across Multiple Jobs
+
+
+
+• Description: Ensure that all Dataflow jobs created by the pipeline have consistent labels.
+
+• Steps:
+
+1. Trigger the CI/CD pipeline multiple times to create several Dataflow jobs.
+
+2. Inspect the labels on each job.
+
+3. Confirm that the labels are consistent across all jobs.
+
+• Expected Result: All Dataflow jobs have the same set of labels.
+
+
+
+Test Case 7: Validate Label Application Using Integration Tests
+
+
+
+• Description: Test the end-to-end pipeline to verify that Dataflow jobs are created with correct labels as part of a larger workflow.
+
+• Steps:
+
+1. Run the CI/CD pipeline with the full application workflow.
+
+2. Inspect the Dataflow jobs created as part of the process.
+
+3. Verify the labels applied to these jobs.
+
+• Expected Result: All Dataflow jobs in the workflow have the correct labels.
+
+
+
+Test Case 8: Check Label Updates on Pipeline Modifications
+
+
+
+• Description: Ensure that updating the CI/CD pipeline configuration updates the labels applied to new Dataflow jobs.
+
+• Steps:
+
+1. Modify the label configuration in the pipeline.
+
+2. Trigger the pipeline to create a new Dataflow job.
+
+3. Verify that the new labels are applied to the job.
+
+• Expected Result: The Dataflow job reflects the updated labels.
