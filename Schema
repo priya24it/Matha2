@@ -1,0 +1,30 @@
+import pandas as pd
+import pyodbc
+
+# Database connection
+conn = pyodbc.connect('DRIVER={SQL Server};SERVER=server_name;DATABASE=db_name;UID=user;PWD=password')
+
+# Query to extract schema
+query = """
+SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'landing_table_name';
+"""
+db_schema = pd.read_sql(query, conn)
+
+# Load expected schema from Excel
+excel_schema = pd.read_excel('expected_schema.xlsx')
+
+# Compare schemas
+comparison = db_schema.merge(excel_schema, on='COLUMN_NAME', suffixes=('_db', '_excel'))
+
+# Identify mismatches
+mismatches = comparison[(comparison['DATA_TYPE_db'] != comparison['DATA_TYPE_excel']) |
+                        (comparison['CHARACTER_MAXIMUM_LENGTH_db'] != comparison['CHARACTER_MAXIMUM_LENGTH_excel'])]
+
+# Print mismatches
+print("Mismatches found:")
+print(mismatches)
+
+# Save mismatches for updating test cases
+mismatches.to_excel('schema_mismatches.xlsx', index=False)
