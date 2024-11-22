@@ -1,0 +1,94 @@
+Test Case for Validating Labels on BigQuery Tables and Views Using INFORMATION_SCHEMA.TABLE_OPTIONS
+
+Test Objective:
+Verify that all BigQuery tables and views have the 14 labels correctly applied by querying the INFORMATION_SCHEMA.TABLE_OPTIONS.
+
+Test Case: Validate Labels Using INFORMATION_SCHEMA.TABLE_OPTIONS
+
+Preconditions
+
+	1.	Ensure all tables and views in the dataset have labels applied in dictionary key:value format.
+	2.	Verify the expected 14 labels, including keys and values, are documented.
+	3.	Have access to the BigQuery dataset to query the INFORMATION_SCHEMA.TABLE_OPTIONS.
+
+Test Steps
+
+Step 1: Query the INFORMATION_SCHEMA.TABLE_OPTIONS
+
+	1.	Use the following SQL query to fetch label metadata for all tables and views:
+
+SELECT 
+    table_name, 
+    option_name, 
+    option_value
+FROM 
+    `project_id.dataset.INFORMATION_SCHEMA.TABLE_OPTIONS`
+WHERE 
+    option_name = 'labels';
+
+
+	2.	Extract the option_value, which contains the labels as a JSON string.
+
+Step 2: Parse and Validate Labels
+
+	1.	Parse the JSON option_value for each table/view to extract the key:value pairs.
+	•	For example, in Python:
+
+import json
+
+labels_json = '{"env":"prod", "team":"analytics"}'  # Example option_value
+labels = json.loads(labels_json)
+
+
+	2.	Verify the following:
+	•	All 14 keys are present.
+	•	Each key has the correct value.
+	•	No extra or missing keys.
+
+Step 3: Validate Labels for All Tables and Views
+
+	1.	Compare the extracted labels against the expected dictionary:
+
+{
+    "env": "prod",
+    "team": "analytics",
+    "project": "data_platform",
+    "owner": "data_team",
+    "cost_center": "12345",
+    "region": "us-central1",
+    "retention": "30_days",
+    "type": "table",
+    "sensitivity": "low",
+    "priority": "high",
+    "source": "etl",
+    "updated_by": "pipeline",
+    "reviewed": "yes",
+    "status": "active"
+}
+
+
+	2.	Ensure labels are consistent across all tables and views in the dataset.
+
+Step 4: Validate Key-Order Consistency
+
+	1.	Confirm that the order of keys in the option_value JSON is consistent across all tables/views. Note that JSON key order may not affect functionality but should be reviewed if required for consistency across services.
+
+Step 5: Validate Post-Update Labels
+
+	1.	Update labels for one or more tables/views using the following SQL command:
+
+ALTER TABLE `project_id.dataset.table_name`
+SET OPTIONS (labels = '{"env":"prod", "team":"analytics"}');
+
+
+	2.	Re-query INFORMATION_SCHEMA.TABLE_OPTIONS to ensure the labels are updated correctly.
+
+Expected Results
+
+	1.	All tables and views in the dataset have exactly 14 labels applied.
+	2.	Labels match the expected key:value pairs with no missing or extra labels.
+	3.	JSON option_value in INFORMATION_SCHEMA.TABLE_OPTIONS contains correctly formatted labels.
+	4.	Label key order is consistent across all tables/views if explicitly required.
+	5.	Updates to labels are correctly reflected in the INFORMATION_SCHEMA.TABLE_OPTIONS.
+
+This test case ensures a comprehensive validation of labels on BigQuery tables and views using the INFORMATION_SCHEMA.TABLE_OPTIONS metadata.
