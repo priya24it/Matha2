@@ -1,0 +1,31 @@
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.utils.dates import days_ago
+
+# Define a function that will intentionally raise an exception to simulate failure
+def fail_task():
+    raise ValueError("This task is designed to fail for testing purposes.")
+
+# Define the default_args for the DAG
+default_args = {
+    'owner': 'airflow',
+    'retries': 0,  # No retries to make the failure immediate
+}
+
+# Define the DAG
+with DAG(
+    dag_id="fail_test_dag",  # Name of the DAG
+    default_args=default_args,
+    description="A test DAG to simulate failure",
+    schedule_interval=None,  # Manual triggering only
+    start_date=days_ago(1),
+    catchup=False,
+) as dag:
+
+    # Define the task that will fail
+    failing_task = PythonOperator(
+        task_id="intentional_failure",  # Name of the task
+        python_callable=fail_task,  # Call the fail_task function
+    )
+
+# The task will run when the DAG is triggered, and it will fail due to the exception in `fail_task`.
