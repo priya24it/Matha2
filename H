@@ -1,0 +1,66 @@
+from googleapiclient.discovery import build
+from google.auth import default
+
+# Replace with your project ID and region
+PROJECT_ID = "your-project-id"
+REGION = "your-region"
+
+# Function to retrieve detailed metadata for a specific job
+def get_job_details(project_id, region, job_id):
+    # Authenticate using default credentials
+    credentials, _ = default()
+    dataflow = build('dataflow', 'v1b3', credentials=credentials)
+    
+    # Fetch detailed metadata for the job
+    request = dataflow.projects().locations().jobs().get(
+        projectId=project_id,
+        location=region,
+        jobId=job_id
+    )
+    response = request.execute()
+    return response
+
+# Function to list all jobs with full metadata
+def list_jobs_with_full_metadata(project_id, region):
+    # Authenticate using default credentials
+    credentials, _ = default()
+    dataflow = build('dataflow', 'v1b3', credentials=credentials)
+    
+    # List all jobs with JOB_VIEW_ALL
+    request = dataflow.projects().locations().jobs().list(
+        projectId=project_id,
+        location=region,
+        view="JOB_VIEW_ALL"  # Fetches detailed job list
+    )
+    response = request.execute()
+    
+    # If jobs exist, fetch full metadata for each
+    jobs = response.get('jobs', [])
+    full_metadata = []
+    for job in jobs:
+        job_id = job.get('id')
+        job_name = job.get('name')
+        print(f"Fetching complete metadata for Job ID: {job_id}, Name: {job_name}")
+        details = get_job_details(project_id, region, job_id)
+        full_metadata.append(details)
+    
+    return full_metadata
+
+# Main function
+def main():
+    print(f"Retrieving Dataflow jobs in project '{PROJECT_ID}' and region '{REGION}'...")
+    jobs = list_jobs_with_full_metadata(PROJECT_ID, REGION)
+    
+    if not jobs:
+        print("No Dataflow jobs found.")
+        return
+
+    print(f"Found {len(jobs)} jobs. Here are their details:")
+    for job in jobs:
+        job_id = job.get('id')
+        job_name = job.get('name')
+        labels = job.get('labels', {})
+        print(f"Job ID: {job_id}, Name: {job_name}, Labels: {labels}")
+
+if __name__ == "__main__":
+    main()
