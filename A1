@@ -1,0 +1,98 @@
+To verify whether all your 77 Dataflow jobs have labels or not, you can follow these steps:
+
+1. Use Google Cloud CLI
+
+The Google Cloud CLI can be used to list all Dataflow jobs and filter those without labels.
+
+Steps:
+
+	1.	List all Dataflow jobs:
+
+gcloud dataflow jobs list --region=<region>
+
+Replace <region> with your Dataflow jobs’ region. If you use multiple regions, repeat for each.
+
+	2.	Check for labels:
+Add a format to list labels for each job:
+
+gcloud dataflow jobs list --region=<region> --format="table(id, name, labels)"
+
+Look for jobs where the labels field is empty.
+
+Automating the Check:
+
+Use a script to identify jobs without labels:
+
+gcloud dataflow jobs list --region=<region> --format="value(id, labels)" | while read job
+do
+  job_id=$(echo $job | cut -d',' -f1)
+  labels=$(echo $job | cut -d',' -f2)
+  if [ -z "$labels" ]; then
+    echo "Job $job_id has no labels"
+  fi
+done
+
+2. Use Google Cloud Console
+
+	1.	Open the Google Cloud Console.
+	2.	Navigate to Dataflow > Jobs.
+	3.	Check the Labels column for each job.
+	4.	Manually note down jobs without labels.
+
+3. Use Python and Google Cloud Client Libraries
+
+You can automate the check using Python with the google-cloud-dataflow or google-cloud-dataflow-v1b3 library.
+
+Sample Python Script:
+
+from google.cloud import dataflow_v1b3
+
+def list_jobs_without_labels(project_id, region):
+    client = dataflow_v1b3.JobsV1Beta3Client()
+    request = dataflow_v1b3.ListJobsRequest(
+        project_id=project_id,
+        region=region,
+        view=dataflow_v1b3.JobView.JOB_VIEW_SUMMARY,
+    )
+    jobs = client.list_jobs(request=request)
+    no_label_jobs = []
+
+    for job in jobs:
+        if not job.labels:
+            no_label_jobs.append(job.id)
+
+    if no_label_jobs:
+        print(f"Jobs without labels: {no_label_jobs}")
+    else:
+        print("All jobs have labels.")
+
+# Replace with your GCP Project ID and Region
+list_jobs_without_labels("your-project-id", "your-region")
+
+4. Use Google Cloud APIs
+
+Make direct API calls to check jobs for missing labels.
+
+Steps:
+
+	1.	Enable the Dataflow API in your project.
+	2.	Use curl or tools like Postman to make the following API request:
+
+curl -X GET \
+  "https://dataflow.googleapis.com/v1b3/projects/<project_id>/jobs?location=<region>" \
+  -H "Authorization: Bearer $(gcloud auth print-access-token)"
+
+
+	3.	Parse the response JSON for jobs missing the labels key.
+
+5. Consolidate and Report
+
+After identifying jobs without labels, you can:
+	•	Add missing labels using the gcloud CLI:
+
+gcloud dataflow jobs update <job-id> --update-labels=<key>=<value>
+
+
+	•	Document the findings for review.
+
+Would you like further help in automating these checks?
