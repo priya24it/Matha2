@@ -1,0 +1,49 @@
+from googleapiclient.discovery import build
+from google.auth import default
+
+# Replace with your project ID and region
+PROJECT_ID = "your-project-id"
+REGION = "your-region"
+
+# Function to list all Dataflow jobs
+def list_dataflow_jobs(project_id, region):
+    # Use default credentials from your environment
+    credentials, _ = default()
+    dataflow = build('dataflow', 'v1b3', credentials=credentials)
+    
+    # Request to list all jobs
+    request = dataflow.projects().locations().jobs().list(
+        projectId=project_id,
+        location=region
+    )
+    response = request.execute()
+    
+    # Extract and return the list of jobs
+    return response.get('jobs', [])
+
+# Function to verify if a job has labels
+def verify_job_labels(job):
+    job_id = job.get('id')
+    job_name = job.get('name')
+    labels = job.get('labels')
+    
+    if labels:
+        print(f"Job ID: {job_id}, Name: {job_name}, Labels: {labels}")
+    else:
+        print(f"Job ID: {job_id}, Name: {job_name} has NO labels.")
+
+# Main execution
+def main():
+    print(f"Retrieving Dataflow jobs in project '{PROJECT_ID}' and region '{REGION}'...")
+    jobs = list_dataflow_jobs(PROJECT_ID, REGION)
+    
+    if not jobs:
+        print("No Dataflow jobs found.")
+        return
+
+    print(f"Found {len(jobs)} Dataflow jobs. Verifying labels...")
+    for job in jobs:
+        verify_job_labels(job)
+
+if __name__ == "__main__":
+    main()
